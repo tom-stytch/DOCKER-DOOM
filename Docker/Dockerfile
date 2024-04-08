@@ -1,39 +1,38 @@
 # USE ALPINE AS BASE IMAGE
-FROM b0nam/alpine-novnc:base
+FROM b0nam/debian-novnc:base
+
+ENV TIGER_VNC_PASSWORD PASSWORD
 
 # INSTALL DEPENDENCIES
-RUN apk add \
-    build-base \
-    gcc \
-    make \
-    sdl2-dev \
-    sdl2_net-dev \
-    sdl2_mixer-dev \
-    py-pillow \
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    libsdl2-dev \
+    libsdl2-net-dev \
+    libsdl2-mixer-dev \
+    python3-pil \
     automake \
     autoconf \
     libtool \
-    pkgconfig
+    pkg-config \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # CLONE CRISPY-DOOM REPOSITORY
+WORKDIR /opt
 RUN git clone https://github.com/fabiangreffrath/crispy-doom.git
 
-# DEFINE WORK DIRECTORY
-WORKDIR /crispy-doom
-
 # RUN COMPILATION COMMANDS
+WORKDIR /opt/crispy-doom
 RUN autoreconf -fiv && \
     ./configure && \
     make && \
     make install
 
 # GET DOOM1 WAD FILE
-RUN wget -O doom-wad-shareware.tar.gz http://ftp.debian.org/debian/pool/non-free/d/doom-wad-shareware/doom-wad-shareware_1.9.fixed.orig.tar.gz && \
-    tar -xzvf doom-wad-shareware.tar.gz -C /crispy-doom && \
-    mv /crispy-doom/doom-wad-shareware-1.9.fixed/doom1.wad /crispy-doom && \
-    rm -rf /crispy-doom/doom-wad-shareware-1.9.fixed && \
-    rm doom-wad-shareware.tar.gz
+RUN wget -O doom1.wad http://ftp.debian.org/debian/pool/non-free/d/doom-wad-shareware/doom-wad-shareware_1.9.fixed.orig.tar.gz && \
+    tar -xzvf doom1.wad && \
+    mv /opt/crispy-doom/doom-wad-shareware-1.9.fixed/doom1.wad /opt/crispy-doom && \
+    rm -rf /opt/crispy-doom/doom-wad-shareware-1.9.fixed
 
-ADD . /app
-
-EXPOSE 8080
+COPY . /src
