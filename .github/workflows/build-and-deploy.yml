@@ -1,7 +1,7 @@
 name: Build and Deploy
 run-name: Build and deploy docker images on dockerhub
 
-on: [push]
+on: [push, workflow_dispatch]
 jobs:
     build_base_job:
       runs-on: ubuntu-latest
