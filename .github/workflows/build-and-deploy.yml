@@ -17,7 +17,7 @@ jobs:
               password: ${{ secrets.DOCKERHUB_PASSWORD }}
           
           - name: Get debian-novnc Base Files
-            run: git clone git@github.com:B0nam/DEBIAN-DOCKER-NOVNC.git
+            run: git clone https://github.com/B0nam/DEBIAN-DOCKER-NOVNC.git
 
           - name: Build debian-novnc Base
             run: docker build -t debian-novnc:base DEBIAN-DOCKER-NOVNC/Base/.
