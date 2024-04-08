@@ -16,10 +16,10 @@ jobs:
               username: ${{ secrets.DOCKERHUB_USERNAME }}
               password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-          - name: Build alpine-doom image
-            run: docker build -t alpine-doom:latest Docker/.
+          - name: Build debian-doom image
+            run: docker build -t debian-doom:latest Docker/.
 
-          - name: Push alpine-doom image
+          - name: Push debian-doom image
             run: |
-              docker tag alpine-doom:latest "${{ secrets.DOCKERHUB_USERNAME }}/alpine-doom:latest"
-              docker push "${{ secrets.DOCKERHUB_USERNAME }}/alpine-doom:latest"
+              docker tag debian-doom:latest "${{ secrets.DOCKERHUB_USERNAME }}/debian-doom:latest"
+              docker push "${{ secrets.DOCKERHUB_USERNAME }}/debian-doom:latest"
