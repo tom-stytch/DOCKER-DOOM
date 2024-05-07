@@ -1,6 +1,8 @@
 # DOCKER-DOOM
 Welcome to DOCKER-DOOM, your gateway to experiencing the classic game DOOM right from your browser within a Docker container using noVNC.
 
+![Banner](/Resources/DOOM-BANNER.png)
+
 ## Overview
 DOCKER-DOOM offers a hassle-free way to enjoy DOOM by encapsulating it within a Docker container, made accessible through noVNC. Whether you prefer building the container based on our Dockerfile or running it directly from a pre-built image, DOCKER-DOOM provides you with the freedom to choose.
 
@@ -21,7 +23,7 @@ docker build -t docker-doom .
 3. **Run the Docker Container**: Once the image is built, start the Docker container, exposing the necessary ports.
 
 ```bash
-docker run -d -p 8080:8080 docker-doom
+docker run -p 8080:8080 b0nam/docker-doom
 ```
 
 You can optionally set the `TIGER_VNC_PASSWORD` environment variable to customize the VNC password. TIGER_VNC_PASSWORD=<PASSWORD>
@@ -34,3 +36,5 @@ docker run -d -p 8080:8080 b0nam/docker-doom
 ```
 
 4. **Access DOOM**: Open your web browser and navigate to `http://localhost:8080` to start playing DOOM. Customize the container configuration or mount game files as needed to enhance your gaming experience. The defaulth NoVNC password is `PASSWORD`.
+
+![PREVIEW](/Resources/PREVIEW.webm)
