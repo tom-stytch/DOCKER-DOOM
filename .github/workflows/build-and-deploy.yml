@@ -1,50 +1,36 @@
 name: Build and Deploy
-run-name: Build and deploy docker images on dockerhub
+run-name: Build and deploy docker images to ECR
 
 on: [push, workflow_dispatch]
 jobs:
-    build_base_job:
-      runs-on: ubuntu-latest
-
-      steps:
-          - name: Checkout
-            uses: actions/checkout@v4
-
-          - name: Autenticate with Docker Hub
-            uses: docker/login-action@v2
-            with:
-              username: ${{ secrets.DOCKERHUB_USERNAME }}
-              password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          
-          - name: Get debian-novnc Base Files
-            run: git clone https://github.com/B0nam/DEBIAN-DOCKER-NOVNC.git
-
-          - name: Build debian-novnc Base
-            run: docker build -t debian-novnc:base DEBIAN-DOCKER-NOVNC/Base/.
-  
-          - name: Push debian-novnc Base
-            run: |
-              docker tag debian-novnc:base "${{ secrets.DOCKERHUB_USERNAME }}/debian-novnc:base"
-              docker push "${{ secrets.DOCKERHUB_USERNAME }}/debian-novnc:base"
-
     build_doom_job:
-      needs: build_base_job
       runs-on: ubuntu-latest
 
       steps:
           - name: Checkout
             uses: actions/checkout@v4
 
-          - name: Autenticate with Docker Hub
-            uses: docker/login-action@v2
+          - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v4.3.1
             with:
-              username: ${{ secrets.DOCKERHUB_USERNAME }}
-              password: ${{ secrets.DOCKERHUB_PASSWORD }}
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-west-2
+              # role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+              # role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+              # role-duration-seconds: 1200
+              # role-session-name: MySessionName
 
-          - name: Build docker-doom image
-            run: docker build -t docker-doom:latest Docker/.
+          - name: Login to Amazon ECR
+            id: login-ecr
+            uses: aws-actions/amazon-ecr-login@v2
 
-          - name: Push docker-doom image
+          - name: Build, tag, and push docker image to Amazon ECR
+            env:
+              REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+              REPOSITORY: tommydeleteme
+              IMAGE_TAG: ${{ github.sha }}
+            working-directory: ./Docker
             run: |
-              docker tag docker-doom:latest "${{ secrets.DOCKERHUB_USERNAME }}/docker-doom:latest"
-              docker push "${{ secrets.DOCKERHUB_USERNAME }}/docker-doom:latest"
+              docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+              docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
